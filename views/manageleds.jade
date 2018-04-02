@@ -1,0 +1,39 @@
+extends layout
+
+block content
+    label.col-sm-12.text-center.table-label.marg-form Form Led Pins
+
+    form(action='/insertleds', method='post')
+        .form-horizontal#insertLeds
+            .form-group
+                label.col-sm-2.control-label Port Arduino
+                .col-sm-6
+                    input#portArduino.form-control(type='text', name='portArduino', placeholder='Port Arduino', required='')
+            .form-group
+                label.col-sm-2.control-label Led Pins
+                .col-sm-6
+                    input#ledPins.form-control(type='text', name='ledPins', placeholder='Led Pins', required='')
+            .form-group
+                label.col-sm-2.control-label Sensor Pin
+                .col-sm-6
+                    input#sensorPin.form-control(type='text', name='sensorPin', placeholder='Sensor Pin', required='')
+            .form-group
+                .col-sm-offset-2.col-sm-8
+                    button#btnInsertLed.btn.btn-primary(type='submit') Save
+                    &nbsp;&nbsp;
+                    button#btnUpdateLed.btn.btn-primary(onclick='updateLed()', type='button') Update    
+    
+    .col-sm-12
+        hr
+
+    label.col-sm-12.text-center.table-label Table List of Led Pins
+
+    .col-lg-11.col-md-11.col-sm-11.center-table#ledPinsList
+        table.table.table-bordered
+            thead
+                tr
+                    th.col-sm-2.text-center Port Arduino
+                    th.col-sm-6.text-center Led Pins
+                    th.col-sm-2.text-center Sensor Pin
+                    th.col-sm-2.text-center Action
+            tbody

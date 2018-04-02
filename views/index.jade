@@ -1,0 +1,159 @@
+extends layout
+
+block content
+
+  script.
+    var socket = io.connect();
+    var $roomLightContainer;
+    var dataPercentage;
+    var roomLedContainer;
+    var roomLeds;
+
+    $(document).ready(function() {
+      //Fungsi Room Light Container
+      socket.on("roomLightLevelReturned", function(data) {
+        console.log(data);
+        $("#display-roomLightContainer").html("");
+        var roomLightContainer =  '<div class="row">' +
+                                  '<center>' +
+                                    '<div class="col-lg-12 col-md-12 col-xs-12">' +
+                                      '<div class="module module--room-light img-responsive">' +
+                                        '<h2 class="module__title img-responsive">Room Light</h2>' +
+                                        '<div class="module__content">' +
+                                          '<div class="chart chart--lightbar">' +
+                                            '<div id="room-light-level" class="chart__bar"></div>' +
+                                          '</div><!-- chart-->' +
+                                        '</div><!-- module__content-->' +
+                                      '</div><!-- module-->' +
+                                    '</div>' +
+                                  '</center>' +
+                                '</div>';
+
+        $("#display-roomLightContainer").append(roomLightContainer).trigger("create");
+        $roomLightContainer = $('.module--room-light');
+        $roomLight = $('#room-light-level');
+
+        common.setModuleToLoaded($roomLightContainer);
+        dataPercentage = data/255 * 100;
+        //- dataPercentage = data;
+        $roomLight.height(dataPercentage+'%');
+      });
+
+      //Fungsi Room Led
+      socket.on("callRoomLeds", function(data) {
+        var ledData = data.pinList;
+        roomLeds = JSON.parse("[" + ledData + "]");
+        var str = "";
+        console.log(roomLeds);
+
+        $("#display-roomLeds").html("");
+        for (var i = 0; i < roomLeds.length; i++) {
+          str += '<div class="col-lg-2 col-md-4 col-xs-4">' +
+                    '<center>' +
+                      '<div class="module--led module--room-led img-responsive">' +
+                        '<h5 class="module--led__title img-responsive">Room Led '+ roomLeds[i] +'</h5>' +
+                        '<div class="module--led__content">' +
+                          '<div id="room-led-toggle" class="chart__icon typcn typcn-lightbulb"></div>' +
+                        '</div><!-- module--led__content-->' +
+                      '</div><!-- module-->' +
+                      '<input id="switch-One" class="displayLeds" name="roomLed" value="'+roomLeds[i]+'" type="checkbox" data-size="small" value="Led" class="switchOne">' +
+                    '</center>' +
+                  '</div>';
+        }
+
+        $("#display-roomLeds").append(str).trigger("create");
+        $("input[name='roomLed']").bootstrapSwitch();
+        roomLedContainer = $('.module--room-led');
+      });
+    });  
+  
+  // modules will appear here
+  center
+    .col-lg-12.col-md-12.col-xs-12
+      .titles
+        img.img-responsive(src='images/titles.png')
+     
+  #display-roomLightContainer
+
+  .row
+    center
+      .col-lg-6.col-md-6.col-xs-6
+        label
+          input.switchManual(id='switch-Manual', type='checkbox', value='man')
+          | 	Manual
+      .col-lg-6.col-md-6.col-xs-6
+        label
+          input.switchAll(id='switch-All', type='checkbox', value='all')
+          | 	Switch All
+
+  #display-roomLeds
+
+  script.
+    var man;
+
+    $(document).ready(function() {
+      //Fungsi Automatic Switch
+      function automaticSwitch() {
+        socket.on("roomLightReturned", function(data) {
+          dataPercentage = data;
+          if (dataPercentage < 60) {
+            $("input[name='roomLed']").bootstrapSwitch('state', true);
+            roomLedContainer.removeClass('is-off').addClass('is-on');
+            socket.emit('switchAllOn', { Leds: 'all on' });
+          } else if (dataPercentage >= 60) {
+            $("input[name='roomLed']").bootstrapSwitch('state', false);
+            roomLedContainer.removeClass('is-on').addClass('is-off');
+            socket.emit('switchAllOff', { Leds: 'all off' });
+          }
+        });
+      };
+
+      //- while (document.getElementById('switch-Manual').checked = false) {
+      //-   automaticSwitch();
+      //- }
+      
+      //Fungsi Manual
+      $('#switch-Manual').on('switchChange.bootstrapSwitch', function (event, state) {
+          if (this.checked) {
+            console.log("Manual");
+            man = true;
+          } else {
+            console.log("Automatic");
+            man = false;
+          }
+      });
+
+      //Fungsi Switch All
+      $('#switch-All').on('switchChange.bootstrapSwitch', function (event, state) {
+          if (man == true) {
+            if (this.checked) {
+              $("input[name='roomLed']").bootstrapSwitch('state', true); 
+              roomLedContainer.removeClass('is-off').addClass('is-on');
+              socket.emit('switchAllOn', { Leds: 'all on' });
+            } else {
+              $("input[name='roomLed']").bootstrapSwitch('state', false);
+              roomLedContainer.removeClass('is-on').addClass('is-off');
+              socket.emit('switchAllOff', { Leds: 'all off' });
+            }
+          } else {
+            automaticSwitch();
+          }
+      });
+
+      //Fungsi Switch One
+      $("#display-roomLeds").on('switchChange.bootstrapSwitch', '.displayLeds', function (event, state) {
+        var index = $(".displayLeds").index(this);
+        var indexvalue = $(this).val();
+        if (man == true) {
+          if (this.checked) {
+            roomLedContainer.eq(index).removeClass('is-off').addClass('is-on');
+            socket.emit('switchOneOn', { index });
+          } else {
+            roomLedContainer.eq(index).removeClass('is-on').addClass('is-off');
+            socket.emit('switchOneOff', { index });
+          } 
+        } else {
+          automaticSwitch();
+        }
+      });
+    });

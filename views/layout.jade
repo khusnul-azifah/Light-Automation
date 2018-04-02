@@ -1,0 +1,52 @@
+doctype html
+html
+  head
+    title= title
+    <link rel="shortcut icon" href="/images/big-bulbs.png" />
+    script(src="/socket.io/socket.io.js")
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
+    
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title Starter Template for Bootstrap
+    link(href='/css/bootstrap.css', rel='stylesheet')
+    link(href='/css/style.css', rel='stylesheet')
+
+    title Bootstrap 3.0 Grid System
+    title Bootstrap
+    link(href='/css/bootstrap-theme.css', rel='stylesheet')
+    link(href='/css/bootstrap.min.css', rel='stylesheet')
+    script(src="/javascripts/jquery.min.js")
+    script(src='/javascripts/bootstrap.js')
+
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='description', content='Turn checkboxes and radio buttons into toggle switches.')
+    meta(name='author', content='Mattia Larentis, Emanuele Marchi and Peter Stein')
+    title Bootstrap Switch · Turn checkboxes and radio buttons into toggle switches
+    link(href='/css/highlight.css', rel='stylesheet')
+    link(href='/css/bootstrap-switch.css', rel='stylesheet')
+    link(href='/css/main.css', rel='stylesheet')
+    script(src='/javascripts/highlight.js')
+    script(src='/javascripts/bootstrap-switch.js')
+    script(src='/javascripts/main.bootstrap.js')
+
+    script(src='/javascripts/global.js')
+    script(src='/javascripts/common.js')
+    
+  body
+    .navbar.navbar-text.navbar-static-top.navbar-fixed-top
+        button.navbar-toggle(data-toggle='collapse', data-target='.navHeaderCollapse')
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        .collapse.navbar-collapse.navHeaderCollapse
+          ul.nav.navbar-nav.navbar-right
+            li.element.active
+              a(href='/dashboard') Dashboard
+            li.element
+              a(href='/manageleds') Manage Leds
+            li.element
+              a(href='/logout') Logout
+
+    block content
